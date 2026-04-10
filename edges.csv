@@ -1,0 +1,15 @@
+source,destination,weight,streetName
+0,1,8,Shahrah-e-Faisal
+0,4,6,MA Jinnah Road
+1,2,5,Khayaban-e-Shamsheer
+2,3,7,University Road
+3,4,4,Rashid Minhas Road
+4,5,9,Sharae Quaideen
+5,6,6,Tariq Road
+6,7,11,Super Highway
+7,8,5,Abul Hasan Isphani Road
+8,9,7,Nishtar Road
+0,2,10,Clifton Bridge
+1,5,8,Korangi Road
+3,6,6,Jail Chowrangi Road
+5,9,12,Sunset Boulevard
