@@ -85,7 +85,7 @@ The system uses **Dijkstra's Shortest Path Algorithm** to:
 
 ```
 ╔════════════════════════════════════════╗
-║     ORDER DISPATCHED SUCCESSFULLY!     ║
+║     ORDER DISPATCHED SUCCESSFULLY     ║
 ╚════════════════════════════════════════╝
 
 [URGENT ORDER #1]
