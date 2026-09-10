@@ -35,20 +35,20 @@ All ADTs are implemented with custom generic templates located directly in `proj
 
 ```mermaid
 flowchart TD
-    Order[New Order Placed] --> Check{Priority >= 5?}
-    Check -->|Yes (Urgent/VIP)| PQ[PriorityQueue: Max-Priority]
-    Check -->|No (Standard)| FIFO[Queue: FIFO Backlog]
+    Order["New Order Placed"] --> Check{"Priority >= 5?"}
+    Check -->|"Yes (Urgent / VIP)"| PQ["PriorityQueue (Max-Priority)"]
+    Check -->|"No (Standard)"| FIFO["Queue (FIFO Backlog)"]
     
-    PQ --> Dispatcher[Dispatcher Engine]
+    PQ --> Dispatcher["Dispatcher Engine"]
     FIFO --> Dispatcher
     
-    Dispatcher --> GraphQuery[Query Graph via Dijkstra]
-    GraphQuery --> FindAgent[Find Nearest Available Agent]
-    FindAgent --> CalculateETA[Calculate Shortest Path & ETA]
+    Dispatcher --> GraphQuery["Query Graph via Dijkstra"]
+    GraphQuery --> FindAgent["Find Nearest Available Agent"]
+    FindAgent --> CalculateETA["Calculate Shortest Path and ETA"]
     
-    CalculateETA --> Commit[Assign Rider & Update State]
-    Commit --> Stack[Push to Stack: Undo History]
-    Commit --> List[Append to LinkedList: Order History]
+    CalculateETA --> Commit["Assign Rider and Update State"]
+    Commit --> Stack["Push to Stack (Undo History)"]
+    Commit --> List["Append to LinkedList (Order History)"]
 ```
 
 ### ADT Specifications
