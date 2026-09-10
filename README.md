@@ -15,7 +15,7 @@ A high-performance C++ food delivery routing simulator utilizing custom Abstract
 
 ### Navigation
 
-[Overview](#project-overview) · [Core Data Structures](#core-data-structures--complexity) · [Network Model](#network-model--routing) · [Features](#key-capabilities) · [Project Structure](#project-structure) · [Build & Run](#build--execution) · [Usage Guide](#interactive-console-workflow) · [Author](#author)
+[Overview](#project-overview) · [Core Data Structures](#core-data-structures--complexity) · [Network Model](#network-model--routing) · [Features](#key-capabilities) · [Project Structure](#project-structure) · [Routing & Dispatch](#algorithmic-routing--dispatch-architecture) · [Simulation Lifecycle](#simulation-lifecycle--functional-architecture) · [Author](#author)
 
 ---
 
@@ -121,57 +121,26 @@ SPEEDEATS---FOOD-DELIVERY-SIMULATOR/
 
 ---
 
-## Build & Execution
+## Algorithmic Routing & Dispatch Architecture
 
-### Prerequisites
+SpeedEats models real-time order scheduling and agent routing through formal algorithmic invariants:
 
-- **C++ Compiler:** `g++` (GCC) with C++17 support or MSVC / Clang.
-
-### Compilation
-
-```bash
-# Compile the simulator
-g++ -std=c++17 project.cpp -o simulator
-
-# Run the executable
-./simulator
-```
-
-### On Windows (PowerShell):
-
-```powershell
-g++ -std=c++17 project.cpp -o simulator.exe
-.\simulator.exe
-```
+- **Dual-Queue Priority Partitioning:** Incoming orders are assigned an integer urgency weight $w \in [1, 10]$. Orders with $w \ge 5$ are treated as priority/VIP deliveries and inserted into the max-heap `PriorityQueue` with logarithmic insertion $O(\log n)$, guaranteeing expedited dispatch. Orders with $w < 5$ are appended to the standard FIFO `Queue` with $O(1)$ enqueue time.
+- **Shortest-Path Traversal (Dijkstra's Algorithm):** The city road network is represented as a weighted undirected graph $G = (V, E)$. When an order is dispatched, Dijkstra's algorithm computes the shortest path distance $d(u, v) = \min \sum_{(i,j) \in P} w_{ij}$ from all available delivery agents $a \in A$ to the fulfillment restaurant node $r$. The agent minimizing $d(a, r)$ is selected.
+- **Dual-Leg Trip & Dynamic ETA Formulation:** Total delivery route duration is modeled as a two-leg journey: agent transit to restaurant ($d_1 = d(a, r)$) and food delivery to destination ($d_2 = d(r, c)$). Estimated Time of Arrival (ETA) is derived from cumulative road weights and distance metrics:
+  $$\text{ETA} = \left(\frac{d(a, r) + d(r, c)}{v_{\text{urban}}}\right) + t_{\text{prep}}$$
+- **State Reversibility via LIFO Stack Invariant:** Every dispatch transaction pushes an immutable state token onto the `Stack<T>`. An instant "Undo" operation pops the latest transaction, restoring the delivery agent to the active pool and re-enqueuing the order without corrupting global network states or history logs.
 
 ---
 
-## Interactive Console Workflow
+## Simulation Lifecycle & Functional Architecture
 
-Upon launching the simulator, an interactive numeric menu provides access to all simulation modules:
+The simulator coordinates data flow across discrete operational subsystems:
 
-### Step 1: Initialize Network and Entities
-1. Select `1` to load road topology: specify `nodes.csv` and `edges.csv`.
-2. Select `2` to load restaurant catalog: specify `restaurants.csv`.
-3. Select `3` to load registered customers: specify `users.csv`.
-4. Select `4` to load available delivery agents: specify `agents.csv`.
-
-### Step 2: Browse & Search
-- Select `5`: Display all restaurants sorted alphabetically (via BST in-order traversal).
-- Select `6`: Search for a specific restaurant by name (BST search).
-- Select `7`: View customer directory.
-- Select `8`: Inspect delivery agents and their availability status.
-
-### Step 3: Order Lifecycle & Dispatch
-- Select `9`: Create a new order by entering `User ID`, `Restaurant ID`, and `Priority` (1–10).
-- Select `10`: Run the automated dispatcher:
-  - Processes high-priority orders from `PriorityQueue`.
-  - Processes backlog orders from standard FIFO `Queue`.
-  - Computes the shortest path from each idle agent to the target restaurant.
-  - Computes path and ETA from restaurant to customer.
-- Select `11`: **Undo** the last dispatch action (pops assignment from `Stack` and resets rider status).
-- Select `12`: View complete historical delivery log (traverses `LinkedList`).
-- Select `13`: Display pending order queue counts.
+1. **Topology & Catalog Initialization:** Streams vertices, weighted edges, restaurant metadata, user coordinates, and agent initial locations directly into internal linked lists, graphs, and binary search trees.
+2. **BST Restaurant Lookup & Traversal:** Indexes restaurant records alphabetically by name within a custom Binary Search Tree, supporting $O(\log n)$ average search complexity and sorted lexicographic directory output via in-order traversal.
+3. **Dispatch & Routing Pipeline:** Coordinates priority queue extraction, Dijkstra shortest path calculations across active agents, and agent state transitions.
+4. **Historical Audit & Inspection:** Maintains complete transactional order lineages within a persistent `LinkedList` for delivery auditing, state tracking, and backlog metrics.
 
 ---
 
